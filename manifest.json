@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "name": "YouTube Open Tabs Total Time",
+  "description": "Sums your open YouTube video tabs and displays the total viewtime.",
+
+  "manifest_version": 2,
+
+  "icons": {
+    "48": "icons/icon-48.png"
+  },
+
+  "browser_action": {
+    "default_icon": "icons/icon-empty-32.png",
+    "default_title": "YouTube Open Tabs Total Time"
+  },
+
+  "background": {
+    "scripts": ["main.js"]
+  },
+
+  "permissions": [
+    "<all_urls>",
+    "tabs"
+  ]
+}
