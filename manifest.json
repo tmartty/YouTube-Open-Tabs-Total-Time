@@ -9,12 +9,6 @@
     "48": "icons/icon-big.png"
   },
 
-  "applications": {
-    "gecko": {
-      "id": "{233991a9-45c2-4981-b4c8-b1364f26ccfc}"
-    }
-  },
-
   "browser_action": {
     "default_icon": "icons/icon-empty-32.png",
     "default_title": "YouTube Open Tabs Total Time"

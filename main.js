@@ -13,12 +13,12 @@ function sec2time(timeInSeconds) {
 
 function parseVideosDuration(tabs) {
     tabs.forEach((tab, index)=>{
-        browser.tabs.executeScript(tab.id, {
+        chrome.tabs.executeScript(tab.id, {
             code:
             `
                 if (document.getElementsByClassName('ytp-time-duration')) {
                     var timeString = document.getElementsByClassName('ytp-time-duration')[0].innerHTML
-                    if (timeString) browser.runtime.sendMessage({timeString: timeString});
+                    if (timeString) chrome.runtime.sendMessage({timeString: timeString});
                 }
             `
         });
@@ -47,7 +47,7 @@ function createIcon() {
   return ctx.getImageData(0, 0, 100, 100);
 }
 
-browser.runtime.onMessage.addListener((request, sender, sendResponse)=>{
+chrome.runtime.onMessage.addListener((request, sender, sendResponse)=>{
     const timeArray = request.timeString.split(':')
     switch(timeArray.length) {
         case 3:
@@ -69,26 +69,27 @@ browser.runtime.onMessage.addListener((request, sender, sendResponse)=>{
     totalSeconds += Number(seconds) + Number(minutes) * 60 + Number(hours) * 60 * 60
     totalTimeString = sec2time(totalSeconds)
 
-    browser.tabs.query({url: "*://*.youtube.com/watch?*"}).then( tabs =>{
+    chrome.tabs.query({url: "*://*.youtube.com/watch?*"}, (tabs)=>{
         tabs.forEach((tab, index)=>{
             if (index + 1 == tabs.length) updateVisuals()
         })
         sendResponse({response: "OK"});
-    }, errorHandler);
+    });
 })
 
 function calculateTime() {
     totalSeconds = 0;
     totalTimeString = '';
-    browser.browserAction.setIcon({path: 'icons/icon-empty-32.png'} );
-    browser.browserAction.setTitle({title: 'YouTube Open Tabs Total Time'});
-    browser.tabs.query({url: "*://*.youtube.com/watch?*"})
-        .then(parseVideosDuration, errorHandler);
+    chrome.browserAction.setIcon({path: 'icons/icon-empty-32.png'} );
+    chrome.browserAction.setTitle({title: 'YouTube Open Tabs Total Time'});
+    chrome.tabs.query({url: "*://*.youtube.com/watch?*"}, (tabs)=>{
+        parseVideosDuration(tabs)
+    })
 }
 
 function updateVisuals() {
-    browser.browserAction.setIcon({imageData: createIcon()});
-    browser.browserAction.setTitle({
+    chrome.browserAction.setIcon({imageData: createIcon()});
+    chrome.browserAction.setTitle({
         title:
             (totalSeconds > 3600 ? totalTimeString.split(':')[0] + 'h ' : '')
             + totalTimeString.split(':')[1] + 'm '
@@ -97,10 +98,10 @@ function updateVisuals() {
     })
 }
 
-browser.tabs.onUpdated.addListener(()=>{
-    calculateTime()
-}, { properties: ['title'] });
+chrome.tabs.onUpdated.addListener((tabId, changeInfo)=>{
+    if (changeInfo.title) calculateTime()
+});
 
-browser.tabs.onRemoved.addListener(()=>{
+chrome.tabs.onRemoved.addListener(()=>{
     calculateTime()
 });
