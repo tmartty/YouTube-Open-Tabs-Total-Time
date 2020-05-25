@@ -119,13 +119,10 @@ chrome.browserAction.onClicked.addListener(() => {
     calculateTime();
 });
 
-chrome.tabs.onUpdated.addListener(
-    (tabId, changeInfo, tab) => {
-        if (changeInfo.status !== "complete") return;
-        if (tab.url.includes("youtube.com/watch?")) calculateTime();
-    },
-    { urls: ["*://*.youtube.com/watch?*"] }
-);
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    if (changeInfo.status !== "complete") return;
+    if (tab.url.includes("youtube.com/watch?")) calculateTime();
+});
 
 chrome.tabs.onRemoved.addListener(() => {
     calculateTime();
